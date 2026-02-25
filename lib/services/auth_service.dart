@@ -97,7 +97,7 @@ class AuthService {
     }
   }
 
-  // Update user profile
+  // Update user profile (display name / photo URL)
   Future<void> updateUserProfile({
     String? displayName,
     String? photoUrl,
@@ -113,6 +113,27 @@ class AuthService {
         }
         await user.reload();
       }
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    }
+  }
+
+  // Change password after reauthenticating with current password
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) throw Exception('No user signed in');
+
+      final cred = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
+      await user.reauthenticateWithCredential(cred);
+      await user.updatePassword(newPassword);
+      await user.reload();
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
     }

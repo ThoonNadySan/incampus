@@ -7,6 +7,7 @@ import 'package:incampus/features/auth/login_screen.dart';
 import 'package:incampus/features/auth/signup_screen.dart';
 import 'package:incampus/features/auth/subscriptions_screen.dart';
 import 'package:incampus/features/home/home_screen.dart';
+import 'package:incampus/features/home/edit_profile_screen.dart';
 import 'package:incampus/features/event_detail/event_detail_screen.dart';
 
 enum RouteNames {
@@ -78,6 +79,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/subscriptions',
         name: RouteNames.subscriptions.name,
         builder: (context, state) => const SubscriptionsScreen(),
+      ),
+      GoRoute(
+        path: '/edit-profile',
+        name: 'editProfile',
+        builder: (context, state) {
+          final showPwd = state.uri.queryParameters['password'] == 'true';
+          return EditProfileScreen(showPasswordSection: showPwd);
+        },
       ),
       GoRoute(
         path: '/home',

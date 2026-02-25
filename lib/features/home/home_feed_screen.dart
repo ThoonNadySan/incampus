@@ -3,12 +3,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:incampus/core/providers/firestore_provider.dart';
 import 'package:incampus/core/theme/app_theme.dart';
+import 'dart:ui';
 
-class HomeFeedScreen extends ConsumerWidget {
+class HomeFeedScreen extends ConsumerStatefulWidget {
   const HomeFeedScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeFeedScreen> createState() => _HomeFeedScreenState();
+}
+
+class _HomeFeedScreenState extends ConsumerState<HomeFeedScreen> {
+  final List<String> _tabs = ['All', '#art', '#design', '#creative', '#tech', '#sports'];
+  String _selectedTab = 'All';
+  bool _isFiltering = false;
+
+  void _onSelectTab(String tab) async {
+    if (_selectedTab == tab) return;
+    setState(() {
+      _isFiltering = true;
+    });
+    await Future.delayed(const Duration(milliseconds: 180));
+    if (!mounted) return;
+    setState(() {
+      _selectedTab = tab;
+      _isFiltering = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final eventsAsync = ref.watch(eventsStreamProvider);
 
     return RefreshIndicator(
@@ -50,36 +73,115 @@ class HomeFeedScreen extends ConsumerWidget {
             );
           }
 
+          // determine filter key and prepare list
+          final filterKey = _selectedTab == 'All' ? null : _selectedTab.replaceFirst('#', '');
+          final displayedEvents = filterKey == null
+              ? events
+              : events.where((event) {
+                  try {
+                    final tags = (event.tags as List).map((t) => t.toString().toLowerCase()).toList();
+                    return tags.contains(filterKey.toLowerCase());
+                  } catch (e) {
+                    return false;
+                  }
+                }).toList();
+
           return CustomScrollView(
+            physics: const BouncingScrollPhysics(),
             slivers: [
+              // header with curved bottom gradient
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppColors.primary, AppColors.primaryLight],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(32),
+                      bottomRight: Radius.circular(32),
+                    ),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Upcoming Events',
-                        style: Theme.of(context).textTheme.displayMedium,
+                        'Discover Campus Events',
+                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Discover campus life and connect with your community',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
                       ),
                     ],
                   ),
                 ),
               ),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final event = events[index];
-                      return _buildEventCard(context, event);
-                    },
-                    childCount: events.length,
+
+              // tabs strip to filter event list
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: SizedBox(
+                    height: 44,
+                    child: ListView.separated(
+                      physics: const BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _tabs.length,
+                      separatorBuilder: (context, index) => const SizedBox(width: 8),
+                      itemBuilder: (context, index) {
+                        final tab = _tabs[index];
+                        final selected = tab == _selectedTab;
+                        return GestureDetector(
+                          onTap: () => _onSelectTab(tab),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: selected ? AppColors.primary : Colors.grey[200],
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: selected ? 0.06 : 0.03),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                )
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                tab,
+                                style: TextStyle(
+                                  color: selected ? Colors.white : AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              SliverOpacity(
+                opacity: _isFiltering ? 0.0 : 1.0,
+                sliver: SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final event = displayedEvents[index];
+                        return _buildEventCard(context, event);
+                      },
+                      childCount: displayedEvents.length,
+                    ),
                   ),
                 ),
               ),
@@ -216,7 +318,7 @@ class HomeFeedScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  // Content
+                  // Content section
                   Container(
                     color: AppColors.cardBackground,
                     padding: const EdgeInsets.all(20),
@@ -295,7 +397,7 @@ class HomeFeedScreen extends ConsumerWidget {
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   attendancePercent > 0.8
                                       ? AppColors.warning
-                                      : AppColors.primary,
+                                      : AppColors.accent,
                                 ),
                               ),
                             ),

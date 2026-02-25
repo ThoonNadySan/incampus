@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:incampus/core/providers/auth_provider.dart';
 import 'package:incampus/core/theme/app_theme.dart';
+import 'dart:ui';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -56,10 +57,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return userAsync == null
         ? const Center(child: CircularProgressIndicator())
         : CustomScrollView(
+            physics: const BouncingScrollPhysics(),
             slivers: [
               // Gradient Header
               SliverAppBar(
-                expandedHeight: 280,
+                expandedHeight: 260,
                 pinned: false,
                 elevation: 0,
                 backgroundColor: AppColors.background,
@@ -77,6 +79,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     child: SafeArea(
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           // Avatar with Shadow
@@ -186,20 +189,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
+                      // account info card (simplified)
                       Container(
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.cardBackground,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.border),
+                          color: Colors.white.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.05),
+                              color: AppColors.primary.withOpacity(0.1),
                               blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            )
+                              offset: const Offset(0, 4),
+                            ),
                           ],
                         ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildInfoRow(
                               context,
@@ -207,24 +212,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               'Full Name',
                               userAsync.displayName ?? 'Not set',
                             ),
-                            Divider(
-                              height: 1,
-                              indent: 16,
-                              endIndent: 16,
-                              color: AppColors.border,
-                            ),
+                            const Divider(),
                             _buildInfoRow(
                               context,
                               Icons.email_outlined,
                               'Email Address',
                               userAsync.email,
                             ),
-                            Divider(
-                              height: 1,
-                              indent: 16,
-                              endIndent: 16,
-                              color: AppColors.border,
-                            ),
+                            const Divider(),
                             _buildInfoRow(
                               context,
                               Icons.calendar_today_outlined,
@@ -249,9 +244,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Edit profile coming soon!')),
-                            );
+                            context.go('/edit-profile');
                           },
                           icon: const Icon(Icons.edit_outlined),
                           label: const Text('Edit Profile'),
@@ -267,9 +260,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         width: double.infinity,
                         child: OutlinedButton.icon(
                           onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Change password coming soon!')),
-                            );
+                            // redirect to edit profile with password section open
+                            context.go('/edit-profile?password=true');
                           },
                           icon: const Icon(Icons.lock_outline),
                           label: const Text('Change Password'),

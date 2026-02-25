@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary colors
-  static const Color primary = Color(0xFF6C4AB6);
-  static const Color primaryLight = Color(0xFF8B6FD4);
-  static const Color primaryDark = Color(0xFF5A3A96);
+  // Primary colors (soft pastel lavender)
+  static const Color primary = Color(0xFFBFA2F5);
+  static const Color primaryLight = Color(0xFFD8C8FF);
+  static const Color primaryDark = Color(0xFFA685E2);
 
-  // Secondary colors
-  static const Color secondary = Color(0xFFB9A7E6);
-  static const Color secondaryLight = Color(0xFFD4C8F0);
-  static const Color secondaryDark = Color(0xFF9D8BC8);
+  // Secondary colors (gradient companion)
+  static const Color secondary = Color(0xFFD8C8FF);
+  static const Color secondaryLight = Color(0xFFEDE8FF);
+  static const Color secondaryDark = Color(0xFFA685E2);
+
+  // Accent / highlights
+  static const Color accent = Color(0xFFFFC0CB);
 
   // Neutral colors
-  static const Color background = Color(0xFFF5F3FF);
-  static const Color cardBackground = Colors.white;
+  static const Color background = Color(0xFFF6F3FF);
+  static final Color cardBackground = Colors.white.withAlpha(240);
   static const Color textDark = Color(0xFF1A1A2E);
   static const Color textLight = Color(0xFF6B7280);
   static const Color border = Color(0xFFE5E0FF);
@@ -38,6 +41,7 @@ class AppTheme {
         surfaceDim: AppColors.background,
         error: AppColors.error,
         outline: AppColors.border,
+        brightness: Brightness.light,
       ),
       scaffoldBackgroundColor: AppColors.background,
       appBarTheme: const AppBarTheme(
@@ -134,8 +138,9 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.accent,
           foregroundColor: Colors.white,
+          shadowColor: AppColors.primary.withAlpha(100),
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           textStyle: const TextStyle(
@@ -146,8 +151,8 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary, width: 1.5),
+          foregroundColor: AppColors.primaryDark,
+          side: BorderSide(color: AppColors.primaryDark, width: 1.5),
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           textStyle: const TextStyle(
@@ -158,7 +163,7 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: AppColors.primaryDark,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           textStyle: const TextStyle(
             fontSize: 14,

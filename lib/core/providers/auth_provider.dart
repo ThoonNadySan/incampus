@@ -56,6 +56,37 @@ final updateProfileProvider =
   );
 });
 
+// Change password provider
+final changePasswordProvider =
+    FutureProvider.family<void, ChangePasswordParams>((ref, params) async {
+  final authService = ref.watch(authServiceProvider);
+  await authService.changePassword(
+    currentPassword: params.currentPassword,
+    newPassword: params.newPassword,
+  );
+});
+
+// Update profile parameters class
+class UpdateProfileParams {
+  final String? displayName;
+  final String? photoUrl;
+
+  UpdateProfileParams({
+    this.displayName,
+    this.photoUrl,
+  });
+}
+
+class ChangePasswordParams {
+  final String currentPassword;
+  final String newPassword;
+
+  ChangePasswordParams({
+    required this.currentPassword,
+    required this.newPassword,
+  });
+}
+
 // Sign up parameters class
 class SignUpParams {
   final String email;
@@ -77,16 +108,5 @@ class SignInParams {
   SignInParams({
     required this.email,
     required this.password,
-  });
-}
-
-// Update profile parameters class
-class UpdateProfileParams {
-  final String? displayName;
-  final String? photoUrl;
-
-  UpdateProfileParams({
-    this.displayName,
-    this.photoUrl,
   });
 }

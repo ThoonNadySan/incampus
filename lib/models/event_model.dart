@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class EventModel {
   final String id;
   final String title;
@@ -32,11 +34,12 @@ class EventModel {
   });
 
   Map<String, dynamic> toMap() {
+    // Use Firestore Timestamp for dates so that queries/sorting work reliably.
     return {
       'id': id,
       'title': title,
       'description': description,
-      'eventDate': eventDate.toIso8601String(),
+      'eventDate': Timestamp.fromDate(eventDate),
       'location': location,
       'imageUrl': imageUrl,
       'capacity': capacity,
@@ -46,18 +49,33 @@ class EventModel {
       'clubName': clubName,
       'clubLogoUrl': clubLogoUrl,
       'tags': tags,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
 
   factory EventModel.fromMap(Map<String, dynamic> map, String docId) {
-    // Handle both Firestore Timestamp and String formats for dates
+    // Helper that converts various Firestore date representations into DateTime.
     DateTime parseDateTime(dynamic dateValue) {
+      if (dateValue == null) {
+        return DateTime.now(); // fallback, though value should exist
+      }
+      if (dateValue is DateTime) {
+        return dateValue;
+      }
       if (dateValue is String) {
-        return DateTime.parse(dateValue);
-      } else if (dateValue.runtimeType.toString() == '_Timestamp') {
-        // Firestore Timestamp - call toDate() method
-        return dateValue.toDate() as DateTime;
+        // stored as ISO string
+        return DateTime.tryParse(dateValue) ?? DateTime.now();
+      }
+      if (dateValue is Timestamp) {
+        return dateValue.toDate();
+      }
+      // Some web snapshots give maps with seconds/nanoseconds
+      if (dateValue is Map) {
+        if (dateValue.containsKey('_seconds') && dateValue.containsKey('_nanoseconds')) {
+          final seconds = dateValue['_seconds'] as int;
+          final nanos = dateValue['_nanoseconds'] as int;
+          return DateTime.fromMillisecondsSinceEpoch(seconds * 1000 + (nanos / 1000000).round());
+        }
       }
       return DateTime.now();
     }
