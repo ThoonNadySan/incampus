@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incampus/core/providers/auth_provider.dart';
 import 'package:incampus/core/theme/app_theme.dart';
+import 'package:go_router/go_router.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   final bool showPasswordSection;
@@ -91,6 +92,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('Edit Profile'),
         backgroundColor: AppColors.primary,
       ),

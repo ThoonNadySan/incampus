@@ -88,6 +88,11 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
           ),
         );
       }
+
+      // make sure any listeners on subscriptions update right away
+      if (currentUser != null) {
+        ref.invalidate(userSubscriptionsStreamProvider(currentUser.uid));
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

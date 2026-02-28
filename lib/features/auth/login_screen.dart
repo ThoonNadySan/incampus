@@ -17,6 +17,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
   String? _errorMessage;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     setState(() {
       _errorMessage = null;
+      _isLoading = true;
     });
 
     try {
@@ -50,12 +52,60 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       if (result != null && mounted) {
         context.go('/home');
+      } else if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString().replaceAll('Exception: ', '');
-      });
+      if (mounted) {
+        setState(() {
+          // Extract the actual error message from the exception
+          _errorMessage = _extractErrorMessage(e);
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  String _extractErrorMessage(dynamic error) {
+    final errorString = error.toString();
+    
+    // Handle different exception formats
+    if (errorString.contains('Exception: ')) {
+      return errorString.replaceAll('Exception: ', '');
+    } else if (errorString.contains('FirebaseAuthException')) {
+      return errorString;
+    }
+    
+    // Return the original error message
+    return errorString.isEmpty ? 'An unknown error occurred. Please try again.' : errorString;
+  }
+
+  Future<void> _handleForgotPassword() async {
+    final email = _emailController.text.trim();
+    
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter your email to reset your password'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+    
+    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid email address'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+    
+    context.push('/forgot-password', extra: email);
   }
 
   @override
@@ -68,7 +118,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 80),
+              const SizedBox(height: 60),
+              // Signature icon/sticker for campus event app
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.purple.shade400,
+                        Colors.purple.shade600,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.purple.shade300.withOpacity(0.5),
+                        blurRadius: 15,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.event_rounded,
+                    size: 60,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
               const Text(
                 'InCampus',
                 style: TextStyle(
@@ -79,11 +159,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Welcome Back',
+                'Campus Event Community',
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 8),
+              Text(
+                'Discover & Join Campus Events',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey.shade600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
               if (_errorMessage != null)
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -92,9 +180,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     border: Border.all(color: Colors.red.shade200),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(
-                    _errorMessage!,
-                    style: TextStyle(color: Colors.red.shade700),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red.shade700, fontSize: 14),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               if (_errorMessage != null) const SizedBox(height: 16),
@@ -148,25 +244,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {
-                    // TODO: Implement forgot password
-                  },
+                  onPressed: _isLoading ? null : _handleForgotPassword,
                   child: const Text('Forgot Password?'),
                 ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: _handleLogin,
+                onPressed: _isLoading ? null : _handleLogin,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  'Login',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text(
+                        'Login',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
               ),
               const SizedBox(height: 24),
               Row(
@@ -174,7 +274,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   const Text('Don\'t have an account? '),
                   TextButton(
-                    onPressed: () => context.go('/signup'),
+                    onPressed: _isLoading ? null : () => context.go('/signup'),
                     child: const Text('Sign Up'),
                   ),
                 ],

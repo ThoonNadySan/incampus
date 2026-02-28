@@ -58,11 +58,19 @@ final eventsByTagProvider =
   return await firestoreService.getEventsByTag(tag);
 });
 
-// User subscriptions provider
+// User subscriptions providers
+// older future-based provider retained for one-off fetches if needed.
 final userSubscriptionsProvider =
     FutureProvider.family<List<EventModel>, String>((ref, userId) async {
   final firestoreService = ref.watch(firestoreServiceProvider);
   return await firestoreService.getUserSubscriptions(userId);
+});
+
+// stream-based provider for real-time updates on user's subscriptions
+final userSubscriptionsStreamProvider =
+    StreamProvider.family<List<EventModel>, String>((ref, userId) {
+  final firestoreService = ref.watch(firestoreServiceProvider);
+  return firestoreService.getUserSubscriptionsStream(userId);
 });
 
 // Check subscription provider

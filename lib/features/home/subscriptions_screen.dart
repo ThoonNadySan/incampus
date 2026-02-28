@@ -39,7 +39,8 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final subscriptionsAsync = ref.watch(userSubscriptionsProvider(currentUser.uid));
+    // watch the real-time stream so changes appear instantly
+    final subscriptionsAsync = ref.watch(userSubscriptionsStreamProvider(currentUser.uid));
 
     return subscriptionsAsync.when(
       data: (events) {
@@ -60,10 +61,12 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                 }
               }).toList();
 
+        // stream provider updates automatically, but keep pull-to-refresh
+        // to allow the user to manually reload if needed
         return RefreshIndicator(
           onRefresh: () async {
-            // ignore: unused_result
-            ref.refresh(userSubscriptionsProvider(currentUser.uid).future);
+            // invalidate underlying future provider in case of issues
+            ref.invalidate(userSubscriptionsStreamProvider(currentUser.uid));
           },
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(),

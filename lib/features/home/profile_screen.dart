@@ -244,7 +244,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            context.go('/edit-profile');
+                            // push instead of go so the user can pop back
+                            context.push('/edit-profile');
                           },
                           icon: const Icon(Icons.edit_outlined),
                           label: const Text('Edit Profile'),
@@ -260,8 +261,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         width: double.infinity,
                         child: OutlinedButton.icon(
                           onPressed: () {
-                            // redirect to edit profile with password section open
-                            context.go('/edit-profile?password=true');
+                            // push so back button will close
+                            context.push('/edit-profile?password=true');
                           },
                           icon: const Icon(Icons.lock_outline),
                           label: const Text('Change Password'),

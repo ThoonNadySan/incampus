@@ -163,7 +163,7 @@ class FirestoreService {
     }
   }
 
-  /// Get user subscriptions
+  /// Get user subscriptions (one-time fetch)
   Future<List<EventModel>> getUserSubscriptions(String userId) async {
     try {
       final subscriptions = await _db
@@ -183,6 +183,23 @@ class FirestoreService {
     } catch (e) {
       throw Exception('Failed to get user subscriptions: $e');
     }
+  }
+
+  /// Stream of user subscriptions so UI can react in real time
+  Stream<List<EventModel>> getUserSubscriptionsStream(String userId) {
+    // listen to the subscription documents and load the corresponding events
+    return _db
+        .collection(usersCollection)
+        .doc(userId)
+        .collection(subscriptionsCollection)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      final ids = snapshot.docs
+          .map((d) => d.data()['eventId'] as String)
+          .toList();
+      final results = await Future.wait(ids.map((id) => getEventById(id)));
+      return results.whereType<EventModel>().toList();
+    });
   }
 
   /// Check if user is subscribed to event

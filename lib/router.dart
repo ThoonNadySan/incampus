@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:incampus/core/providers/auth_provider.dart';
 import 'package:incampus/features/auth/login_screen.dart';
 import 'package:incampus/features/auth/signup_screen.dart';
+import 'package:incampus/features/auth/forgot_password_screen.dart';
 import 'package:incampus/features/auth/subscriptions_screen.dart';
 import 'package:incampus/features/home/home_screen.dart';
 import 'package:incampus/features/home/edit_profile_screen.dart';
@@ -30,6 +31,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final isLoggingIn = state.matchedLocation == '/login';
       final isSigningUp = state.matchedLocation == '/signup';
+      final isForgottingPassword = state.matchedLocation == '/forgot-password';
       final isSelectingSubscriptions = state.matchedLocation == '/subscriptions';
 
       return authState.when(
@@ -41,14 +43,14 @@ final routerProvider = Provider<GoRouter>((ref) {
               return null;
             }
             // Redirect away from login/signup to home
-            if (isLoggingIn || isSigningUp) {
+            if (isLoggingIn || isSigningUp || isForgottingPassword) {
               return '/home';
             }
             return null;
           } else {
             // User is not authenticated
-            // Allow access to login and signup only
-            if (!isLoggingIn && !isSigningUp && !isSelectingSubscriptions) {
+            // Allow access to login, signup, and forgot-password only
+            if (!isLoggingIn && !isSigningUp && !isSelectingSubscriptions && !isForgottingPassword) {
               return '/login';
             }
             return null;
@@ -57,7 +59,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         loading: () => null, // Show loading state
         error: (error, stackTrace) {
           // On error, redirect to login
-          if (!isLoggingIn && !isSigningUp && !isSelectingSubscriptions) {
+          if (!isLoggingIn && !isSigningUp && !isSelectingSubscriptions && !isForgottingPassword) {
             return '/login';
           }
           return null;
@@ -74,6 +76,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/signup',
         name: RouteNames.signup.name,
         builder: (context, state) => const SignUpScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        name: 'forgotPassword',
+        builder: (context, state) {
+          final email = state.extra as String?;
+          return ForgotPasswordScreen(initialEmail: email);
+        },
       ),
       GoRoute(
         path: '/subscriptions',
