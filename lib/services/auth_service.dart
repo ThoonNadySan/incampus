@@ -55,7 +55,7 @@ class AuthService {
         );
       }
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     }
     return null;
   }
@@ -83,7 +83,7 @@ class AuthService {
         );
       }
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     }
     return null;
   }
@@ -114,7 +114,7 @@ class AuthService {
         await user.reload();
       }
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     }
   }
 
@@ -135,7 +135,7 @@ class AuthService {
       await user.updatePassword(newPassword);
       await user.reload();
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     }
   }
 
@@ -144,7 +144,7 @@ class AuthService {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     }
   }
 
@@ -156,7 +156,7 @@ class AuthService {
         await user.sendEmailVerification();
       }
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     }
   }
 
@@ -168,7 +168,7 @@ class AuthService {
         await user.delete();
       }
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     }
   }
 

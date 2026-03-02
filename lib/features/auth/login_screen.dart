@@ -48,20 +48,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             password: _passwordController.text,
           ),
         ).future,
-      );
+      ).timeout(const Duration(seconds: 10), onTimeout: () {
+        throw Exception('timeout');
+      });
 
       if (result != null && mounted) {
         context.go('/home');
       } else if (mounted) {
         setState(() {
-          _isLoading = false;
+          _errorMessage = 'Wrong password provided.';
         });
       }
     } catch (e) {
+      print('Login error: $e');
+      if (mounted) {
+        final msg = _extractErrorMessage(e);
+        setState(() {
+          _errorMessage = (msg == 'timeout')
+            ? 'Login request timed out. Please try again.'
+            : (msg.isEmpty ? 'Wrong password provided.' : msg);
+        });
+      }
+    } finally {
       if (mounted) {
         setState(() {
-          // Extract the actual error message from the exception
-          _errorMessage = _extractErrorMessage(e);
           _isLoading = false;
         });
       }

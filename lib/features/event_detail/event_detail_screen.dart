@@ -93,6 +93,9 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
       if (currentUser != null) {
         ref.invalidate(userSubscriptionsStreamProvider(currentUser.uid));
       }
+
+      // Refresh event data so attendee count updates immediately
+        ref.invalidate(eventProvider(widget.eventId));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
