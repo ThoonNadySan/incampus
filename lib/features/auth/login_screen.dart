@@ -250,6 +250,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   return null;
                 },
               ),
+              if (_errorMessage != null && _errorMessage!.toLowerCase().contains('password'))
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 4.0, right: 4.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red.shade700, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerRight,

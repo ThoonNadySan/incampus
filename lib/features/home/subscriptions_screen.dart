@@ -371,16 +371,7 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // Navigate to home feed - the parent will handle this
-                  },
-                  icon: const Icon(Icons.explore),
-                  label: const Text('Browse Events'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                  ),
-                ),
+                // ...existing code...
               ],
             ),
           ),
