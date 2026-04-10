@@ -48,32 +48,32 @@ class LandingPage extends StatelessWidget {
             // Hero Section
             Padding(
               padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 10 : 20, vertical: isSmallScreen ? 16 : 24),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Left: Headline and buttons
-                    SizedBox(
-                      width: isSmallScreen ? 180 : 300,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Never Miss Campus Updates Again.',
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 22 : 30,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF4285F4),
-                            ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Left: Headline and buttons
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Never Miss Campus Updates Again.',
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 22 : 30,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF4285F4),
                           ),
-                          SizedBox(height: isSmallScreen ? 8 : 12),
-                          Text(
-                            'All official announcements, club updates, and campus events in one organized app for MFU students.',
-                            style: TextStyle(fontSize: isSmallScreen ? 13 : 16, color: Colors.black87),
-                          ),
-                          SizedBox(height: isSmallScreen ? 16 : 24),
-                          Row(
+                        ),
+                        SizedBox(height: isSmallScreen ? 8 : 12),
+                        Text(
+                          'All official announcements, club updates, and campus events in one organized app for MFU students.',
+                          style: TextStyle(fontSize: isSmallScreen ? 13 : 16, color: Colors.black87),
+                        ),
+                        SizedBox(height: isSmallScreen ? 16 : 24),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
                             children: [
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
@@ -98,44 +98,44 @@ class LandingPage extends StatelessWidget {
                               ),
                             ],
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: isSmallScreen ? 10 : 20),
+                  // Right: Announcement Feed Card Illustration
+                  Flexible(
+                    flex: 1,
+                    child: Container(
+                      width: double.infinity,
+                      height: isSmallScreen ? 110 : 150,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.15),
+                            blurRadius: 10,
+                            offset: const Offset(0, 6),
+                          ),
                         ],
                       ),
-                    ),
-                    SizedBox(width: isSmallScreen ? 10 : 20),
-                    // Right: Announcement Feed Card Illustration
-                    SizedBox(
-                      width: isSmallScreen ? 120 : 180,
-                      child: Container(
-                        height: isSmallScreen ? 110 : 150,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.15),
-                              blurRadius: 10,
-                              offset: const Offset(0, 6),
-                            ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Announcement Feed', style: TextStyle(fontSize: isSmallScreen ? 14 : 18, fontWeight: FontWeight.bold, color: Colors.black54)),
+                            SizedBox(height: 6),
+                            Text('Event Cards', style: TextStyle(fontSize: isSmallScreen ? 10 : 13, color: Colors.black45)),
+                            Text('Clean Organized Layout', style: TextStyle(fontSize: isSmallScreen ? 10 : 13, color: Colors.black45)),
                           ],
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Announcement Feed', style: TextStyle(fontSize: isSmallScreen ? 14 : 18, fontWeight: FontWeight.bold, color: Colors.black54)),
-                              SizedBox(height: 6),
-                              Text('Event Cards', style: TextStyle(fontSize: isSmallScreen ? 10 : 13, color: Colors.black45)),
-                              Text('Clean Organized Layout', style: TextStyle(fontSize: isSmallScreen ? 10 : 13, color: Colors.black45)),
-                            ],
-                          ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-
             // Why Students Miss Important Updates
             Container(
               color: Colors.white,
@@ -166,7 +166,6 @@ class LandingPage extends StatelessWidget {
                 ],
               ),
             ),
-
             // One Platform. All Campus Information.
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 0),
@@ -203,7 +202,6 @@ class LandingPage extends StatelessWidget {
                 ],
               ),
             ),
-
             // Core Features
             Container(
               color: Colors.white,
