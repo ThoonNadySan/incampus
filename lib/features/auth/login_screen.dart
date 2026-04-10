@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:incampus/core/providers/auth_provider.dart';
 import 'package:incampus/core/theme/app_theme.dart';
 
+
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  final bool enableAuth;
+  const LoginScreen({super.key, this.enableAuth = true});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -34,6 +36,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!widget.enableAuth) {
+      // Skip provider logic in tests
+      return;
+    }
 
     setState(() {
       _errorMessage = null;
@@ -205,6 +212,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               if (_errorMessage != null) const SizedBox(height: 16),
               TextFormField(
+                key: const Key('email_field'),
                 controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
@@ -225,6 +233,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 16),
               TextFormField(
+                key: const Key('password_field'),
                 controller: _passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
@@ -244,7 +253,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null || value.trim().isEmpty) {
                     return 'Password is required';
                   }
                   return null;
@@ -276,6 +285,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
+                key: const Key('login_button'),
                 onPressed: _isLoading ? null : _handleLogin,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),

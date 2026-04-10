@@ -10,8 +10,10 @@ import 'package:incampus/features/auth/subscriptions_screen.dart';
 import 'package:incampus/features/home/home_screen.dart';
 import 'package:incampus/features/home/edit_profile_screen.dart';
 import 'package:incampus/features/event_detail/event_detail_screen.dart';
+import 'package:incampus/features/landing/landing_page.dart';
 
 enum RouteNames {
+  landing,
   login,
   signup,
   subscriptions,
@@ -24,49 +26,40 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
 
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/landing',
     refreshListenable: GoRouterRefreshStream(
       authState.whenData((user) => user),
     ),
     redirect: (context, state) {
-      final isLoggingIn = state.matchedLocation == '/login';
-      final isSigningUp = state.matchedLocation == '/signup';
-      final isForgottingPassword = state.matchedLocation == '/forgot-password';
-      final isSelectingSubscriptions = state.matchedLocation == '/subscriptions';
+      final user = authState.value;
 
-      return authState.when(
-        data: (user) {
-          // User is authenticated
-          if (user != null) {
-            // If on subscriptions page, allow it
-            if (isSelectingSubscriptions) {
-              return null;
-            }
-            // Redirect away from login/signup to home
-            if (isLoggingIn || isSigningUp || isForgottingPassword) {
-              return '/home';
-            }
-            return null;
-          } else {
-            // User is not authenticated
-            // Allow access to login, signup, and forgot-password only
-            if (!isLoggingIn && !isSigningUp && !isSelectingSubscriptions && !isForgottingPassword) {
-              return '/login';
-            }
-            return null;
-          }
-        },
-        loading: () => null, // Show loading state
-        error: (error, stackTrace) {
-          // On error, redirect to login
-          if (!isLoggingIn && !isSigningUp && !isSelectingSubscriptions && !isForgottingPassword) {
-            return '/login';
-          }
+      final isOnLanding = state.matchedLocation == '/landing';
+      final isOnLogin = state.matchedLocation == '/login';
+      final isOnSignup = state.matchedLocation == '/signup';
+
+      // 🔓 If NOT logged in
+      if (user == null) {
+        // Allow landing + auth pages
+        if (isOnLanding || isOnLogin || isOnSignup) {
           return null;
-        },
-      );
+        }
+        return '/landing'; // 👈 go to landing
+      }
+
+      // 🔐 If logged in
+      if (isOnLanding || isOnLogin || isOnSignup) {
+        return '/home'; // 👈 go to home after login
+      }
+
+      return null;
     },
+
     routes: [
+      GoRoute(
+        path: '/landing',
+        name: RouteNames.landing.name,
+        builder: (context, state) => const LandingPage(),
+      ),
       GoRoute(
         path: '/login',
         name: RouteNames.login.name,
