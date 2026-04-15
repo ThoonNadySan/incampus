@@ -67,7 +67,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         });
       }
     } catch (e) {
-      print('Login error: $e');
+      // print('Login error: $e'); // Removed for production
       if (mounted) {
         final msg = _extractErrorMessage(e);
         setState(() {
